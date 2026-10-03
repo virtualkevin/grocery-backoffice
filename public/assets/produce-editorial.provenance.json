@@ -1,0 +1,7 @@
+{
+  "asset": "/assets/produce-editorial.png",
+  "generatedAt": "2026-10-03T20:53:27Z",
+  "method": "Built-in image_gen tool",
+  "usage": "Pregenerated produce artwork for dashboard and flyer. Exact offer text is rendered by the application from the approved promotion revision.",
+  "prompt": "Use case: ads-marketing. Asset type: editorial produce artwork for a grocery purchasing dashboard and a promotional flyer. Create one wide landscape photographic still life of beautiful fresh grocery produce: ripe heirloom tomatoes, a halved avocado with its pit and a whole avocado, bright lemons, a bunch of carrots with leafy tops, crisp romaine and several strawberries, artfully arranged on a pale warm cream stone surface. Refined independent neighborhood market aesthetic, natural side daylight, tactile realistic textures, soft gentle shadows, generous warm cream negative space in the upper half and left side for later application-rendered typography. Balanced restrained composition, colorful produce clustered along lower and right edges, premium editorial food photography. Absolutely no text, no letters, no numbers, no labels, no logos, no packaging, no watermark. Wide landscape 1536x1024 composition."
+}

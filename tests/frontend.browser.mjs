@@ -1,0 +1,114 @@
+/** Run with the API and frontend already started: npm run test:ui.
+ * Optional BASE_URL=http://localhost:3001 and SCREENSHOT_DIR=/tmp/grove-ui.
+ * Exercises a new simulated run; never requests live provider execution.
+ */
+import { chromium } from 'playwright';
+import assert from 'node:assert/strict';
+import { mkdir, writeFile } from 'node:fs/promises';
+const baseURL=process.env.BASE_URL||'http://localhost:5173';
+const output=process.env.SCREENSHOT_DIR||'/tmp/grove-ui';
+await mkdir(output,{recursive:true});
+const browser=await chromium.launch({headless:true,args:['--no-sandbox'],...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
+const errors=[];
+const checks=[];
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1060},deviceScaleFactor:1});
+ page.on('pageerror',error=>errors.push(error.message));
+ await page.goto(baseURL,{waitUntil:'domcontentloaded'});
+ await page.locator('.hero').waitFor();
+ for(const path of ['/server/fixtures.ts','/server/fixtures.ts?raw','/server/fixtures.ts?raw??','/server/engine.ts','/data/produce.sqlite','/data/integrations-zoo.json','/.env','/.git/config']){
+  assert.ok([403,404].includes((await page.request.get(`${baseURL}${path}`)).status()),`Private file must be blocked: ${path}`);
+ }
+ checks.push('Direct development-server private source, database, and credential paths are blocked');
+ await page.screenshot({path:`${output}/overview-initial.png`,fullPage:true});
+ await page.getByRole('button',{name:/^(Start purchasing run|New purchasing run)$/}).click();
+ await page.getByLabel('Agent execution').selectOption('simulation');
+ const started=page.waitForResponse(response=>response.url().endsWith('/api/runs')&&response.request().method()==='POST');
+ await page.getByRole('button',{name:'Start purchasing',exact:true}).click();
+ const startedResponse=await started;
+ assert.equal(startedResponse.ok(),true,'Run start must succeed');
+ const newRun=await startedResponse.json();
+ await page.waitForFunction(id=>document.querySelector('main')?.dataset.runId===id&&document.body.innerText.includes('24 / 24 decisions resolved'),newRun.id,{timeout:90000});
+ const run=await (await page.request.get(`${baseURL}/api/runs/${newRun.id}`)).json();
+ assert.equal(run.mode,'simulation');
+ assert.equal(run.decisions.length,24);
+ assert.equal(run.progress.suppliersResponded,8);
+ assert.ok(run.decisions.some(d=>d.escalated),'An escalation is visible');
+ assert.ok(run.decisions.some(d=>d.outcome==='unavailable'),'A walkaway is visible');
+ assert.equal(run.budget.committedCents+run.budget.reservedCents+run.budget.unallocatedCents,run.budget.totalCents);
+ assert.equal('privateSuppliers' in run,false);
+ assert.equal(JSON.stringify(run).includes('floorCaseCents'),false);
+ checks.push('24 decisions / 8 suppliers, spotlight outcomes, exact budget balance, no private state in public response');
+ const census=run.evidence.find(e=>e.id==='census-94110');
+ assert.equal(Number(census?.values?.population??census?.values?.P9_001N),68336,'Verified 2020 Census population is available');
+ assert.equal(census.observedAt,'2020-04-01');
+ assert.equal(run.evidence.filter(e=>e.source.includes('USDA')&&e.mode!=='unavailable').length,5,'Five sourced USDA commodity observations remain available');
+ checks.push('Verified 2020 Census population and five dated USDA commodity observations');
+ await page.screenshot({path:`${output}/overview-complete.png`,fullPage:true});
+ await page.locator('.nav-item').filter({hasText:'Purchasing'}).click();
+ await page.getByRole('button',{name:'Supplier comparison',exact:true}).click();
+ assert.equal(await page.locator('.matrix-table tbody tr').count(),24);
+ await page.screenshot({path:`${output}/matrix.png`,fullPage:true});
+ await page.getByRole('button',{name:'Decisions',exact:true}).click();
+ await page.getByRole('button',{name:'Inspect Strawberries',exact:true}).click();
+ await page.getByRole('dialog').getByText('Manager approved escalation',{exact:true}).waitFor();
+ await page.getByRole('heading',{name:'This product’s conversation',exact:true}).waitFor();
+ const strawberryText=await page.getByRole('dialog').innerText();
+ assert.ok(strawberryText.includes('Minimum 1 case')&&strawberryText.includes('pint available'));
+ assert.ok(strawberryText.includes('requesting $')&&strawberryText.includes('Approved $'));
+ await page.screenshot({path:`${output}/product-detail.png`,fullPage:true});
+ await page.getByRole('button',{name:'Close product details'}).click();
+ await page.getByRole('button',{name:'Inspect Apples',exact:true}).click();
+ await page.getByRole('heading',{name:'Seasonal planning assumption',exact:true}).waitFor();
+ const apple=run.items.find(item=>item.skuId==='apples');
+ const appleText=await page.getByRole('dialog').innerText();
+ assert.ok(appleText.includes(`${apple.demand.baselineForecastUnits} → ${apple.demand.adjustedForecastUnits}`));
+ assert.ok(appleText.includes(`${apple.neededUnits} → ${apple.quantity}`));
+ assert.ok(appleText.includes('not a discovered event or measured lift'));
+ await page.screenshot({path:`${output}/seasonal-detail.png`,fullPage:true});
+ await page.getByRole('button',{name:'Close product details'}).click();
+ checks.push('24-row supplier comparison, chronological escalation conversation, and explicit seasonal case-rounding assumptions');
+ assert.equal((await page.request.get(`${baseURL}/api/runs/${newRun.id}/god`)).status(),403);
+ await page.getByRole('button',{name:'God mode',exact:true}).click();
+ await page.getByRole('button',{name:'Open god view',exact:true}).click();
+ await page.getByRole('button',{name:'Inspect private state'}).first().waitFor();
+ await page.screenshot({path:`${output}/god.png`,fullPage:true});
+ await page.getByRole('button',{name:'Inspect private state'}).first().click();
+ await page.getByRole('dialog').getByText('Minimum / case',{exact:true}).first().waitFor();
+ const god=await(await page.request.get(`${baseURL}/api/runs/${newRun.id}/god`)).json();
+ assert.ok(god.privateSuppliers.some(item=>item.negotiationState==='selected'));
+ assert.ok(god.privateSuppliers.some(item=>item.negotiationState==='not selected'));
+ assert.ok((await page.getByRole('dialog').innerText()).includes('No stock holds'));
+ await page.screenshot({path:`${output}/god-detail.png`,fullPage:true});
+ await page.getByRole('button',{name:'Close private details'}).click();
+ await page.getByRole('button',{name:'Operator',exact:true}).click();
+ await page.getByRole('button',{name:'God mode',exact:true}).waitFor();
+ await page.waitForTimeout(100);
+ assert.equal((await page.request.get(`${baseURL}/api/runs/${newRun.id}/god`)).status(),403);
+ checks.push('God state denied before authorization and again after returning to operator');
+ await page.locator('.nav-item').filter({hasText:'Promotions'}).click();
+ await page.getByRole('button',{name:'Approve promotion plan',exact:true}).click();
+ await page.getByRole('button',{name:'Create approved flyer',exact:true}).click();
+ await page.getByRole('button',{name:'Print flyer',exact:true}).waitFor();
+ const approved=await (await page.request.get(`${baseURL}/api/runs/${newRun.id}`)).json();
+ assert.equal(approved.flyer.status,'ready');
+ assert.ok(approved.promotions.every(p=>p.approved));
+ for(const promotion of approved.promotions){
+  const offer=page.locator('.flyer-offer').filter({has:page.getByRole('heading',{name:promotion.name,exact:true})});
+  assert.ok((await offer.innerText()).includes((promotion.retailPriceCents/100).toFixed(2)),'Flyer price matches approved plan');
+ }
+ await page.screenshot({path:`${output}/flyer.png`,fullPage:true});
+ checks.push('Approval freezes plan; composed flyer prices match every approved promotion');
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.waitForFunction(id=>document.querySelector('main')?.dataset.runId===id,newRun.id);
+ await page.getByText('24 / 24 decisions resolved',{exact:false}).waitFor();
+ checks.push('Reload restores same run and completed decisions');
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:`${output}/mobile.png`,fullPage:true});
+ const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth);
+ assert.equal(overflow,false,'Mobile page should not overflow horizontally');
+ checks.push('390px mobile layout has no document overflow');
+ assert.deepEqual(errors,[],'No browser runtime errors');
+ await writeFile(`${output}/results.json`,JSON.stringify({passed:true,checks,errors,runId:newRun.id},null,2));
+ console.log(JSON.stringify({passed:true,checks,errors,screenshots:output},null,2));
+}finally{await browser.close();}

@@ -1,0 +1,209 @@
+{
+  "status": "live",
+  "querySkuId": "cucumbers",
+  "observedAt": "2026-10-03T22:35:42.487Z",
+  "providers": [
+    {
+      "platform": "tiktok",
+      "status": "live",
+      "count": 10,
+      "chargedUsd": "0.00188",
+      "runUrl": "https://app.glasser.ai/runs/3b1913c0-340d-42f5-b8bc-b11888059e86"
+    },
+    {
+      "platform": "x",
+      "status": "live",
+      "count": 10,
+      "chargedUsd": "0.0011",
+      "runUrl": "https://app.glasser.ai/runs/495dfa04-a6df-4807-be80-ea7e2096a7cf"
+    }
+  ],
+  "totalChargedUsd": "0.002980",
+  "signals": 20,
+  "source": "Actual authorized Glasser API calls, one fixed query per platform, no pagination",
+  "maximumNormalizedRecordsPerPlatform": 10,
+  "historicalGrowthProven": false,
+  "freshSignalsByPlatform": {
+    "tiktok": 10,
+    "x": 2
+  },
+  "offlineAdapterTestsPassed": 8,
+  "postedDateRanges": {
+    "tiktok": {
+      "oldest": "2026-10-01T01:53:17Z",
+      "newest": "2026-10-03T00:59:25Z",
+      "freshWithin14Days": 10,
+      "future": 0
+    },
+    "x": {
+      "oldest": "2024-12-28T04:40:48Z",
+      "newest": "2026-10-01T03:30:00Z",
+      "freshWithin14Days": 2,
+      "future": 0
+    }
+  },
+  "purchasingValidation": "Opt-in trend adjustment validated by separate offline backend tests; no new paid full Band/Zoo purchasing run performed.",
+  "realBrowserEndToEnd": {
+    "driver": "Real Playwright browser against production UI; no intercepted provider or run responses",
+    "runId": "5e4f91a0-7c43-4fed-ae4a-794bf872f232",
+    "status": "complete",
+    "useTrends": true,
+    "actualGlasser": true,
+    "actualZooWork": true,
+    "actualBand": true,
+    "purchasingDurationMs": 133844,
+    "throughFlyerDurationMs": 137681,
+    "resolved": 24,
+    "supplierResponders": 8,
+    "outcomes": {
+      "accepted": 23,
+      "unavailable": 1
+    },
+    "receipts": {
+      "confirmed": 23
+    },
+    "band": {
+      "sent": 82,
+      "received": 82,
+      "processed": 82,
+      "failedInbox": 0,
+      "recentFailures": []
+    },
+    "bandMessageKinds": {
+      "rfq": 12,
+      "quote": 17,
+      "counteroffer": 5,
+      "accept_quote": 23,
+      "decision": 23,
+      "budget_request": 1,
+      "budget_decision": 1
+    },
+    "bandSentByRole": {
+      "fruit-buyer": 23,
+      "supplier-wholesale": 2,
+      "supplier-farm": 2,
+      "supplier-fruit": 9,
+      "supplier-surplus": 2,
+      "supplier-import": 9,
+      "supplier-rapid": 2,
+      "vegetable-buyer": 18,
+      "supplier-organic": 1,
+      "supplier-coop": 13,
+      "manager": 1
+    },
+    "zoowork": {
+      "calls": 23,
+      "completed": 23,
+      "failed": 0,
+      "completedByRole": {
+        "manager": 2,
+        "supplier-wholesale": 2,
+        "supplier-farm": 2,
+        "supplier-fruit": 3,
+        "supplier-surplus": 2,
+        "supplier-import": 4,
+        "supplier-rapid": 2,
+        "supplier-organic": 1,
+        "supplier-coop": 1,
+        "fruit-buyer": 3,
+        "vegetable-buyer": 1
+      },
+      "concurrency": {
+        "active": 0,
+        "queued": 0,
+        "limit": 4
+      }
+    },
+    "glasser": {
+      "observedAt": "2026-10-03T22:44:50.314Z",
+      "providers": [
+        {
+          "platform": "tiktok",
+          "status": "live",
+          "count": 6,
+          "chargedUsd": "0.00188",
+          "runUrl": "https://app.glasser.ai/runs/be7d9744-c0a5-4473-a203-1ffedf8e5859"
+        },
+        {
+          "platform": "x",
+          "status": "live",
+          "count": 10,
+          "chargedUsd": "0.0011",
+          "runUrl": "https://app.glasser.ai/runs/0adb80c7-618a-46c7-ae57-41164e64c6f9"
+        }
+      ],
+      "totalChargedUsd": "0.002980",
+      "freshRunUrlsDifferFromOriginalProbe": true
+    },
+    "cucumberDemand": {
+      "baselineForecastUnits": 40,
+      "adjustedForecastUnits": 42,
+      "seasonalAdjustmentUnits": 0,
+      "trendAdjustmentUnits": 2,
+      "trendEvidenceIds": [
+        "social-2c3e719145029af00d23",
+        "social-e1c8ac7ea4263eeb677b",
+        "social-3cb71f300ba099702e4c",
+        "social-07ec1280590de7eb39c0",
+        "social-dd19b6bf26c15b1d8130",
+        "social-8b6da39cae9bff725f27"
+      ],
+      "adjustmentCapUnits": 4,
+      "rationale": "Operator opted in to a social-interest hypothesis: +2 units (5% baseline, capped at 2). Not measured growth or proven local demand. Seasonal adjustment separately adds 0 units."
+    },
+    "frozenPromotions": [
+      {
+        "id": "cbd40e49-5634-4ff0-82c6-5d6541327c67",
+        "revision": 1,
+        "skuId": "bananas",
+        "name": "Bananas",
+        "role": "loss_leader",
+        "retailPriceCents": 76,
+        "regularPriceCents": 150,
+        "unit": "1 lb bag",
+        "quantityCap": 12,
+        "costPerUnitCents": 96,
+        "exposureCents": 235,
+        "startsAt": "2026-10-04",
+        "endsAt": "2026-10-05",
+        "rationale": "A capped produce loss leader with explicitly budgeted exposure.",
+        "approved": true
+      },
+      {
+        "id": "185287f8-84e3-41ee-a771-2a1a2d95f500",
+        "revision": 1,
+        "skuId": "apples",
+        "name": "Apples",
+        "role": "complement",
+        "retailPriceCents": 108,
+        "regularPriceCents": 120,
+        "unit": "each",
+        "quantityCap": 24,
+        "costPerUnitCents": 77,
+        "exposureCents": 0,
+        "startsAt": "2026-10-04",
+        "endsAt": "2026-10-05",
+        "rationale": "A complementary produce offer with positive expected unit margin.",
+        "approved": true
+      },
+      {
+        "id": "83622923-a51a-40d0-9883-6a3001f8fbdb",
+        "revision": 1,
+        "skuId": "carrots",
+        "name": "Carrots",
+        "role": "complement",
+        "retailPriceCents": 112,
+        "regularPriceCents": 125,
+        "unit": "1 lb bag",
+        "quantityCap": 24,
+        "costPerUnitCents": 82,
+        "exposureCents": 0,
+        "startsAt": "2026-10-04",
+        "endsAt": "2026-10-05",
+        "rationale": "A complementary produce offer with positive expected unit margin.",
+        "approved": true
+      }
+    ],
+    "error": null
+  }
+}

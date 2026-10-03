@@ -1,0 +1,766 @@
+{
+  "date": "2026-10-03",
+  "scope": "Authorized bounded integration probes; no real purchases",
+  "sdkVersions": {
+    "@zoowork-ai/sdk": "0.10.2",
+    "@band-ai/sdk": "0.5.0"
+  },
+  "zoowork": {
+    "catalogAuthenticated": true,
+    "model": "litellm/gpt-5.6-luna",
+    "managerCreatedStartedAndReady": true,
+    "completedInferenceCalls": 1,
+    "schemaValidManagerBudgetAction": true,
+    "streamFinishedObserved": true,
+    "customToolsVerified": false,
+    "mode": "strict JSON decisions with backend validation",
+    "representativeBatchLines": 12,
+    "representativeBatchValid": true,
+    "representativeBatchMs": 10071,
+    "batchInferenceCalls": 1
+  },
+  "band": {
+    "managerIdentityAuthenticated": true,
+    "configuredUuidMatched": true,
+    "managerWebSocketConnected": true,
+    "peerLookupAuthenticated": true,
+    "additionalGroceryRolesDiscovered": 0,
+    "connectedRoles": 11,
+    "requiredRoles": 11,
+    "actualAgentRoundTripVerified": true,
+    "additionalConfiguredRolesAtLastCheck": 10,
+    "allConfiguredIdentitiesAuthenticated": true,
+    "actualAgentRoundTripMs": 1116,
+    "actualAgentRoundTripScope": "All14 required manager/buyer and buyer/supplier links, bidirectional actual Band messages",
+    "allRequiredPairsVerified": 14,
+    "allRequiredPairsDurationMs": 16489,
+    "fullElevenRoleEndToEndVerified": true
+  },
+  "remainingGates": [],
+  "privacy": "No keys, vendor resource identifiers, raw prompts, or raw reasoning included",
+  "fullZooRehearsal": {
+    "timestamp": "2026-10-03T21:13:21.137Z",
+    "transport": "IN_PROCESS_TEST_TRANSPORT_NOT_BAND",
+    "database": "in-memory",
+    "actualZooWork": true,
+    "bandVerified": false,
+    "durationMs": 120284,
+    "status": "reviewing",
+    "resolved": 24,
+    "supplierResponders": 8,
+    "outcomes": {
+      "accepted": 23,
+      "unavailable": 1
+    },
+    "spotlights": [
+      {
+        "skuId": "apples",
+        "spotlight": "win",
+        "outcome": "accepted",
+        "escalated": false
+      },
+      {
+        "skuId": "strawberries",
+        "spotlight": "escalation",
+        "outcome": "accepted",
+        "escalated": true
+      },
+      {
+        "skuId": "avocados",
+        "spotlight": "walkaway",
+        "outcome": "unavailable",
+        "escalated": false
+      }
+    ],
+    "roleCalls": {
+      "manager": 2,
+      "supplier-wholesale": 2,
+      "supplier-farm": 2,
+      "supplier-surplus": 2,
+      "supplier-fruit": 3,
+      "supplier-import": 4,
+      "supplier-rapid": 2,
+      "supplier-organic": 1,
+      "supplier-coop": 1,
+      "fruit-buyer": 3,
+      "vegetable-buyer": 1
+    },
+    "roleCompletions": {
+      "manager": 2,
+      "supplier-wholesale": 2,
+      "supplier-farm": 2,
+      "supplier-surplus": 2,
+      "supplier-fruit": 3,
+      "supplier-import": 4,
+      "supplier-rapid": 2,
+      "supplier-organic": 1,
+      "supplier-coop": 1,
+      "fruit-buyer": 3,
+      "vegetable-buyer": 1
+    },
+    "roleKinds": {
+      "manager_plan": 1,
+      "supplier_quotes": 17,
+      "buyer_decision": 2,
+      "manager_budget": 1,
+      "buyer_counteroffer": 2
+    },
+    "messageKinds": {
+      "rfq": 12,
+      "quote": 17,
+      "counteroffer": 5,
+      "budget_request": 1,
+      "budget_decision": 1
+    },
+    "transportErrors": 0,
+    "handlerErrors": [],
+    "provider": {
+      "configured": true,
+      "authenticated": true,
+      "model": "litellm/gpt-5.6-luna",
+      "ready": true,
+      "calls": 23,
+      "completed": 23,
+      "failed": 0,
+      "recentFailures": [],
+      "active": 0,
+      "rolesProvisioned": [
+        "manager",
+        "supplier-fruit",
+        "supplier-farm",
+        "supplier-surplus",
+        "supplier-rapid",
+        "supplier-wholesale",
+        "supplier-import",
+        "supplier-organic",
+        "supplier-coop",
+        "fruit-buyer",
+        "vegetable-buyer"
+      ],
+      "concurrency": {
+        "active": 0,
+        "queued": 0,
+        "limit": 4
+      }
+    }
+  },
+  "rehearsalHistory": [
+    {
+      "status": "stopped_early_after_provisioning_failures",
+      "actualZooWork": true,
+      "transport": "IN_PROCESS_TEST_TRANSPORT_NOT_BAND",
+      "bandVerified": false,
+      "completedActionsBeforeStop": 8,
+      "completedRoles": [
+        "manager",
+        "supplier-fruit",
+        "supplier-farm",
+        "supplier-surplus",
+        "supplier-rapid",
+        "supplier-wholesale"
+      ],
+      "initialFailureCodes": "Not retained by first harness; stage/code logging added before focused retry",
+      "cleanup": "Task sessions interrupted and owned resources stopped; no account upgrades",
+      "full24DecisionGatePassed": false
+    }
+  ],
+  "offlineVerification": {
+    "adapterTestsPassed": 12,
+    "strictProjectTypecheckPassed": true,
+    "totalTestsPassed": 33
+  },
+  "resourceAudit": {
+    "ownedDemoResources": 11,
+    "distinctRoles": 11,
+    "duplicateRoleResources": 0,
+    "stoppedResources": 11
+  },
+  "realBandHistory": [
+    {
+      "runId": "e1f236c1-9cff-49fb-9419-1670c8bcc2fd",
+      "status": "reviewing_degraded",
+      "resolved": 24,
+      "supplierResponders": 0,
+      "accepted": 0,
+      "bandSent": 0,
+      "bandReceived": 0,
+      "zooCompleted": 1,
+      "failure": "Initial adapter diagnostic retained only request_failed; later probes identified text metadata validation and buyer room invitation permissions."
+    },
+    {
+      "probe": "manager_buyer_structured_roundtrip",
+      "passed": true,
+      "durationMs": 1116,
+      "bandSent": 2,
+      "bandReceived": 2,
+      "bandProcessed": 2,
+      "zooCalls": 0
+    },
+    {
+      "runId": "bdc61634-8794-4a03-9d6e-4169360411f6",
+      "status": "reviewing_degraded",
+      "resolved": 24,
+      "supplierResponders": 0,
+      "accepted": 0,
+      "zooCompleted": 1,
+      "failure": "Buyer add_participant HTTP403. Manager-created room with buyer and supplier subsequently verified supported."
+    },
+    {
+      "runId": "6008f8af-059b-46b5-9bd5-742731f9b16e",
+      "status": "failed",
+      "supplierResponders": 8,
+      "resolved": 0,
+      "bandSentDuringRun": 24,
+      "bandReceivedDuringRun": 24,
+      "bandProcessedDuringRun": 24,
+      "bandFailures": 0,
+      "zooCompleted": 14,
+      "completedByRole": {
+        "manager": 1,
+        "supplier-wholesale": 2,
+        "supplier-fruit": 1,
+        "supplier-farm": 2,
+        "supplier-surplus": 2,
+        "supplier-rapid": 2,
+        "supplier-import": 1,
+        "supplier-organic": 1,
+        "supplier-coop": 1,
+        "fruit-buyer": 1
+      },
+      "failure": "One fruit-buyer choice referenced a quote belonging to a different SKU (strawberries); confirmed by read-only task-owned Zoo session inspection. Eleven other choices valid."
+    }
+  ],
+  "fixesVerified": [
+    "Band text endpoint rejects custom metadata with HTTP422 /message/metadata Unexpected field; content+mentions accepted.",
+    "Manager can create private rooms and add task-owned buyer and supplier; actual agents retain distinct credentials for sending."
+  ],
+  "bandPreflight": {
+    "ok": true,
+    "transport": "actual-band",
+    "roundTrip": true,
+    "pairsVerified": 14,
+    "results": [
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "manager",
+        "to": "fruit-buyer",
+        "durationMs": 1169
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "manager",
+        "to": "vegetable-buyer",
+        "durationMs": 1107
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "fruit-buyer",
+        "to": "supplier-wholesale",
+        "durationMs": 1176
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "fruit-buyer",
+        "to": "supplier-farm",
+        "durationMs": 1152
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "fruit-buyer",
+        "to": "supplier-surplus",
+        "durationMs": 1202
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "fruit-buyer",
+        "to": "supplier-fruit",
+        "durationMs": 1192
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "fruit-buyer",
+        "to": "supplier-import",
+        "durationMs": 1151
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "fruit-buyer",
+        "to": "supplier-rapid",
+        "durationMs": 1163
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "vegetable-buyer",
+        "to": "supplier-wholesale",
+        "durationMs": 1128
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "vegetable-buyer",
+        "to": "supplier-farm",
+        "durationMs": 1213
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "vegetable-buyer",
+        "to": "supplier-organic",
+        "durationMs": 1225
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "vegetable-buyer",
+        "to": "supplier-surplus",
+        "durationMs": 1150
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "vegetable-buyer",
+        "to": "supplier-coop",
+        "durationMs": 1286
+      },
+      {
+        "ok": true,
+        "transport": "actual-band",
+        "roundTrip": true,
+        "from": "vegetable-buyer",
+        "to": "supplier-rapid",
+        "durationMs": 1101
+      }
+    ],
+    "durationMs": 16489
+  },
+  "fullActualRun": {
+    "runId": "5f857a77-0348-47c3-9d5e-b5bca04f285d",
+    "transport": "ACTUAL_BAND",
+    "actualZooWork": true,
+    "actualBand": true,
+    "status": "complete",
+    "createdAt": "2026-10-03T22:06:45.173Z",
+    "purchasingFinishedAt": "2026-10-03T22:09:11.788Z",
+    "durationMs": 146615,
+    "resolved": 24,
+    "supplierResponders": 8,
+    "outcomes": {
+      "accepted": 23,
+      "unavailable": 1
+    },
+    "receipts": {
+      "confirmed": 23
+    },
+    "spotlights": [
+      {
+        "skuId": "apples",
+        "outcome": "accepted",
+        "escalated": false,
+        "receiptStatus": "confirmed"
+      },
+      {
+        "skuId": "strawberries",
+        "outcome": "accepted",
+        "escalated": true,
+        "receiptStatus": "confirmed"
+      },
+      {
+        "skuId": "avocados",
+        "outcome": "unavailable",
+        "escalated": false,
+        "receiptStatus": null
+      }
+    ],
+    "band": {
+      "sent": 82,
+      "received": 82,
+      "processed": 82,
+      "failedInbox": 0,
+      "recentFailures": []
+    },
+    "bandSentByRole": {
+      "fruit-buyer": 23,
+      "supplier-farm": 2,
+      "supplier-fruit": 9,
+      "supplier-surplus": 2,
+      "supplier-wholesale": 2,
+      "supplier-rapid": 2,
+      "supplier-import": 9,
+      "vegetable-buyer": 18,
+      "supplier-organic": 1,
+      "supplier-coop": 13,
+      "manager": 1
+    },
+    "bandReceivedByRole": {
+      "supplier-fruit": 9,
+      "supplier-farm": 2,
+      "supplier-surplus": 2,
+      "supplier-wholesale": 2,
+      "fruit-buyer": 23,
+      "supplier-rapid": 2,
+      "supplier-import": 9,
+      "supplier-organic": 1,
+      "vegetable-buyer": 18,
+      "supplier-coop": 13,
+      "manager": 1
+    },
+    "bandProcessedByRole": {
+      "supplier-fruit": 9,
+      "supplier-farm": 2,
+      "supplier-surplus": 2,
+      "supplier-wholesale": 2,
+      "fruit-buyer": 23,
+      "supplier-rapid": 2,
+      "supplier-import": 9,
+      "supplier-organic": 1,
+      "vegetable-buyer": 18,
+      "supplier-coop": 13,
+      "manager": 1
+    },
+    "bandMessageKinds": {
+      "rfq": 12,
+      "quote": 17,
+      "counteroffer": 5,
+      "accept_quote": 23,
+      "decision": 23,
+      "budget_request": 1,
+      "budget_decision": 1
+    },
+    "zoowork": {
+      "calls": 23,
+      "completed": 23,
+      "failed": 0,
+      "completedByRole": {
+        "manager": 2,
+        "supplier-farm": 2,
+        "supplier-fruit": 3,
+        "supplier-surplus": 2,
+        "supplier-wholesale": 2,
+        "supplier-rapid": 2,
+        "supplier-import": 4,
+        "supplier-organic": 1,
+        "supplier-coop": 1,
+        "fruit-buyer": 3,
+        "vegetable-buyer": 1
+      },
+      "recentFailures": [],
+      "concurrency": {
+        "active": 0,
+        "queued": 0,
+        "limit": 4
+      }
+    },
+    "unexpectedFailedDecisions": 0,
+    "error": null,
+    "operatorApprovalAndFlyerPending": false,
+    "uiVerification": {
+      "reportedBy": "independent UI agent",
+      "sameActualRun": true,
+      "operatorApproval": true,
+      "flyerComposition": true,
+      "exactOfferTerms": true,
+      "godModeAuthorizationBoundary": true,
+      "reloadAndMobile": true,
+      "javascriptErrors": 0
+    },
+    "frozenPromotions": [
+      {
+        "id": "8d4bbf66-4b30-4565-88c9-43de0113ecd2",
+        "revision": 1,
+        "skuId": "bananas",
+        "name": "Bananas",
+        "role": "loss_leader",
+        "retailPriceCents": 76,
+        "regularPriceCents": 150,
+        "unit": "1 lb bag",
+        "quantityCap": 12,
+        "costPerUnitCents": 96,
+        "exposureCents": 235,
+        "startsAt": "2026-10-04",
+        "endsAt": "2026-10-05",
+        "rationale": "A capped produce loss leader with explicitly budgeted exposure.",
+        "approved": true
+      },
+      {
+        "id": "a5e86142-7189-4bbb-befb-0394910c0692",
+        "revision": 1,
+        "skuId": "apples",
+        "name": "Apples",
+        "role": "complement",
+        "retailPriceCents": 108,
+        "regularPriceCents": 120,
+        "unit": "each",
+        "quantityCap": 24,
+        "costPerUnitCents": 77,
+        "exposureCents": 0,
+        "startsAt": "2026-10-04",
+        "endsAt": "2026-10-05",
+        "rationale": "A complementary produce offer with positive expected unit margin.",
+        "approved": true
+      },
+      {
+        "id": "88004025-8d57-4b94-9180-301b804cb931",
+        "revision": 1,
+        "skuId": "carrots",
+        "name": "Carrots",
+        "role": "complement",
+        "retailPriceCents": 112,
+        "regularPriceCents": 125,
+        "unit": "1 lb bag",
+        "quantityCap": 24,
+        "costPerUnitCents": 82,
+        "exposureCents": 0,
+        "startsAt": "2026-10-04",
+        "endsAt": "2026-10-05",
+        "rationale": "A complementary produce offer with positive expected unit margin.",
+        "approved": true
+      }
+    ],
+    "promotionRevision": 1
+  },
+  "glasserTrends": {
+    "status": "live",
+    "querySkuId": "cucumbers",
+    "observedAt": "2026-10-03T22:35:42.487Z",
+    "providers": [
+      {
+        "platform": "tiktok",
+        "status": "live",
+        "count": 10,
+        "chargedUsd": "0.00188",
+        "runUrl": "https://app.glasser.ai/runs/3b1913c0-340d-42f5-b8bc-b11888059e86"
+      },
+      {
+        "platform": "x",
+        "status": "live",
+        "count": 10,
+        "chargedUsd": "0.0011",
+        "runUrl": "https://app.glasser.ai/runs/495dfa04-a6df-4807-be80-ea7e2096a7cf"
+      }
+    ],
+    "totalChargedUsd": "0.002980",
+    "signals": 20,
+    "source": "Actual authorized Glasser API calls, one fixed query per platform, no pagination",
+    "maximumNormalizedRecordsPerPlatform": 10,
+    "historicalGrowthProven": false,
+    "freshSignalsByPlatform": {
+      "tiktok": 10,
+      "x": 2
+    },
+    "offlineAdapterTestsPassed": 8,
+    "postedDateRanges": {
+      "tiktok": {
+        "oldest": "2026-10-01T01:53:17Z",
+        "newest": "2026-10-03T00:59:25Z",
+        "freshWithin14Days": 10,
+        "future": 0
+      },
+      "x": {
+        "oldest": "2024-12-28T04:40:48Z",
+        "newest": "2026-10-01T03:30:00Z",
+        "freshWithin14Days": 2,
+        "future": 0
+      }
+    },
+    "purchasingValidation": "Verified through an actual browser-driven Glasser refresh and fresh live ZooWork/Band run with social opt-in,24decisions,8suppliers and23confirmedreceipts."
+  },
+  "qualityPass": {
+    "adapterTestsPassed": 14,
+    "trendAdapterTestsPassed": 8,
+    "fixed": [
+      "Fence actual Band publication after cancellation while room provisioning was pending.",
+      "Serialize concurrent room use until membership and subscriptions verified; persist only verified pair rooms.",
+      "Reject unsupported nested social record shapes; unknown/future timestamps stay undated.",
+      "Preserve per-platform Glasser idempotency keys across ambiguous network failures."
+    ],
+    "paidPurchasingRunRepeated": true,
+    "coreRunPreserved": "5f857a77-0348-47c3-9d5e-b5bca04f285d",
+    "repeatAuthorization": "User explicitly requested real Playwright end-to-end after trend implementation",
+    "aggregateTestsPassed": 49
+  },
+  "realBrowserTrendEndToEnd": {
+    "driver": "Real Playwright browser against production UI; no intercepted provider or run responses",
+    "runId": "5e4f91a0-7c43-4fed-ae4a-794bf872f232",
+    "status": "complete",
+    "useTrends": true,
+    "actualGlasser": true,
+    "actualZooWork": true,
+    "actualBand": true,
+    "purchasingDurationMs": 133844,
+    "throughFlyerDurationMs": 137681,
+    "resolved": 24,
+    "supplierResponders": 8,
+    "outcomes": {
+      "accepted": 23,
+      "unavailable": 1
+    },
+    "receipts": {
+      "confirmed": 23
+    },
+    "band": {
+      "sent": 82,
+      "received": 82,
+      "processed": 82,
+      "failedInbox": 0,
+      "recentFailures": []
+    },
+    "bandMessageKinds": {
+      "rfq": 12,
+      "quote": 17,
+      "counteroffer": 5,
+      "accept_quote": 23,
+      "decision": 23,
+      "budget_request": 1,
+      "budget_decision": 1
+    },
+    "bandSentByRole": {
+      "fruit-buyer": 23,
+      "supplier-wholesale": 2,
+      "supplier-farm": 2,
+      "supplier-fruit": 9,
+      "supplier-surplus": 2,
+      "supplier-import": 9,
+      "supplier-rapid": 2,
+      "vegetable-buyer": 18,
+      "supplier-organic": 1,
+      "supplier-coop": 13,
+      "manager": 1
+    },
+    "zoowork": {
+      "calls": 23,
+      "completed": 23,
+      "failed": 0,
+      "completedByRole": {
+        "manager": 2,
+        "supplier-wholesale": 2,
+        "supplier-farm": 2,
+        "supplier-fruit": 3,
+        "supplier-surplus": 2,
+        "supplier-import": 4,
+        "supplier-rapid": 2,
+        "supplier-organic": 1,
+        "supplier-coop": 1,
+        "fruit-buyer": 3,
+        "vegetable-buyer": 1
+      },
+      "concurrency": {
+        "active": 0,
+        "queued": 0,
+        "limit": 4
+      }
+    },
+    "glasser": {
+      "observedAt": "2026-10-03T22:44:50.314Z",
+      "providers": [
+        {
+          "platform": "tiktok",
+          "status": "live",
+          "count": 6,
+          "chargedUsd": "0.00188",
+          "runUrl": "https://app.glasser.ai/runs/be7d9744-c0a5-4473-a203-1ffedf8e5859"
+        },
+        {
+          "platform": "x",
+          "status": "live",
+          "count": 10,
+          "chargedUsd": "0.0011",
+          "runUrl": "https://app.glasser.ai/runs/0adb80c7-618a-46c7-ae57-41164e64c6f9"
+        }
+      ],
+      "totalChargedUsd": "0.002980",
+      "freshRunUrlsDifferFromOriginalProbe": true
+    },
+    "cucumberDemand": {
+      "baselineForecastUnits": 40,
+      "adjustedForecastUnits": 42,
+      "seasonalAdjustmentUnits": 0,
+      "trendAdjustmentUnits": 2,
+      "trendEvidenceIds": [
+        "social-2c3e719145029af00d23",
+        "social-e1c8ac7ea4263eeb677b",
+        "social-3cb71f300ba099702e4c",
+        "social-07ec1280590de7eb39c0",
+        "social-dd19b6bf26c15b1d8130",
+        "social-8b6da39cae9bff725f27"
+      ],
+      "adjustmentCapUnits": 4,
+      "rationale": "Operator opted in to a social-interest hypothesis: +2 units (5% baseline, capped at 2). Not measured growth or proven local demand. Seasonal adjustment separately adds 0 units."
+    },
+    "frozenPromotions": [
+      {
+        "id": "cbd40e49-5634-4ff0-82c6-5d6541327c67",
+        "revision": 1,
+        "skuId": "bananas",
+        "name": "Bananas",
+        "role": "loss_leader",
+        "retailPriceCents": 76,
+        "regularPriceCents": 150,
+        "unit": "1 lb bag",
+        "quantityCap": 12,
+        "costPerUnitCents": 96,
+        "exposureCents": 235,
+        "startsAt": "2026-10-04",
+        "endsAt": "2026-10-05",
+        "rationale": "A capped produce loss leader with explicitly budgeted exposure.",
+        "approved": true
+      },
+      {
+        "id": "185287f8-84e3-41ee-a771-2a1a2d95f500",
+        "revision": 1,
+        "skuId": "apples",
+        "name": "Apples",
+        "role": "complement",
+        "retailPriceCents": 108,
+        "regularPriceCents": 120,
+        "unit": "each",
+        "quantityCap": 24,
+        "costPerUnitCents": 77,
+        "exposureCents": 0,
+        "startsAt": "2026-10-04",
+        "endsAt": "2026-10-05",
+        "rationale": "A complementary produce offer with positive expected unit margin.",
+        "approved": true
+      },
+      {
+        "id": "83622923-a51a-40d0-9883-6a3001f8fbdb",
+        "revision": 1,
+        "skuId": "carrots",
+        "name": "Carrots",
+        "role": "complement",
+        "retailPriceCents": 112,
+        "regularPriceCents": 125,
+        "unit": "1 lb bag",
+        "quantityCap": 24,
+        "costPerUnitCents": 82,
+        "exposureCents": 0,
+        "startsAt": "2026-10-04",
+        "endsAt": "2026-10-05",
+        "rationale": "A complementary produce offer with positive expected unit margin.",
+        "approved": true
+      }
+    ],
+    "error": null
+  }
+}
