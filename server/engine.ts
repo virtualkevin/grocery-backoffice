@@ -12,6 +12,7 @@ import type { DatabaseSync } from "node:sqlite";
 import type {
   Evidence,
   AgentEnvelope,
+  AgentTranscript,
   Bootstrap,
   Capabilities,
   Decision,
@@ -52,6 +53,7 @@ export interface ProviderBridge {
   status(): unknown;
   cancelRun?(runId: string): Promise<unknown>;
   resetRuns?(runIds: string[]): void;
+  transcript?(runId: string): Pick<AgentTranscript,"messages" | "omittedMessages" | "truncated">;
 }
 export class DomainError extends Error {
   constructor(
@@ -102,7 +104,7 @@ export class Engine {
     this.db = openDatabase(path);
     for (const row of this.db.prepare("SELECT snapshot FROM runs").all()) {
       const run = JSON.parse(String(row.snapshot)) as RunSnapshot;
-      if (!terminal.has(run.status)) {
+      if (!terminal.has(run.status) && !["reviewing", "flyer_ready"].includes(run.status)) {
         run.status = "interrupted";
         run.generation++;
         for (const decision of run.decisions)
@@ -183,6 +185,11 @@ export class Engine {
         promotionAllowanceCents: DEFAULT_PROMOTION_ALLOWANCE,
       },
     };
+  }
+  transcript(id: string): AgentTranscript {
+    const run = this.get(id);
+    const data = run.mode === "live" ? this.bridge?.transcript?.(id) : undefined;
+    return { runId: id, mode: run.mode, source: run.mode === "live" ? "band" : "simulation", messages: [], omittedMessages: 0, truncated: false, ...data };
   }
   resetDemo() {
     const ids = [...this.runs.keys()];

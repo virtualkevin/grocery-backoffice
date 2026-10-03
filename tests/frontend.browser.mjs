@@ -52,7 +52,7 @@ try{
  await page.getByRole('button',{name:'Decisions',exact:true}).click();
  await page.getByRole('button',{name:'Inspect Strawberries',exact:true}).click();
  await page.getByRole('dialog').getByText('Manager approved escalation',{exact:true}).waitFor();
- await page.getByRole('heading',{name:'This product’s conversation',exact:true}).waitFor();
+ await page.getByRole('heading',{name:'Decision summaries',exact:true}).waitFor();
  const strawberryText=await page.getByRole('dialog').innerText();
  assert.ok(strawberryText.includes('Minimum 1 case')&&strawberryText.includes('pint available'));
  assert.ok(strawberryText.includes('requesting $')&&strawberryText.includes('Approved $'));

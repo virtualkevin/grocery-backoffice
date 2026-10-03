@@ -351,3 +351,17 @@ test("cancellation and restart mark pending supplier receipts unconfirmed withou
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('restart preserves finished negotiations awaiting review or flyer composition',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'produce-review-'));const path=join(dir,'db.sqlite');let e=new Engine(path,0);
+ try {
+  const r=e.create({},false);await e.execute(r.id);const reviewing=e.snapshot(r.id);assert.equal(reviewing.status,'reviewing');
+  // Seed stored delivery evidence; this test exercises persistence, not provider transport.
+  for(const decision of reviewing.decisions)if(decision.outcome==='accepted')decision.receiptStatus='confirmed';
+  e.db.prepare('UPDATE runs SET snapshot=? WHERE id=?').run(JSON.stringify(reviewing),r.id);
+  e.close();e=new Engine(path,0);
+  assert.deepEqual(e.snapshot(r.id),reviewing);
+  e.approve(r.id,reviewing.promotionRevision);const approved=e.snapshot(r.id);assert.equal(approved.status,'flyer_ready');e.close();e=new Engine(path,0);
+  assert.deepEqual(e.snapshot(r.id),approved);assert.equal(e.flyer(r.id).status,'complete');
+ }finally{e.close();rmSync(dir,{recursive:true,force:true})}
+});

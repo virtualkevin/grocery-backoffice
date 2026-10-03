@@ -2,6 +2,7 @@ import { Agent, GenericAdapter, type PlatformMessage } from '@band-ai/sdk';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { projectTranscript, type StoredTranscriptRow } from './transcript.js';
 import { ROLE_IDS, type AgentEnvelope, type RoleId } from '../../shared/types.js';
 import { IntegrationError, isEnvelope, safeError } from './safety.js';
 
@@ -144,6 +145,12 @@ export class BandTransport {
     })();
     this.creatingRooms.set(key,operation);
     try{return await operation;}catch(error){this.recordFailure(stage,envelope,error);this.rooms.delete(key);this.db.prepare('DELETE FROM rooms WHERE pair_key=?').run(key);throw error;}finally{this.creatingRooms.delete(key);}
+  }
+  transcript(runId:string){
+    const rows=this.db.prepare(`SELECT 'outgoing' direction,id,payload,state,band_id,room_id FROM outbox WHERE json_extract(payload,'$.runId')=?
+      UNION ALL SELECT 'incoming' direction,id,payload,state,band_id,room_id FROM inbox WHERE json_extract(payload,'$.runId')=?
+      ORDER BY id LIMIT 2001`).all(runId,runId) as unknown as StoredTranscriptRow[];
+    return {...projectTranscript(rows.slice(0,2000),runId),truncated:rows.length>2000};
   }
   resetRuns(runIds:string[]){
     this.db.exec('BEGIN IMMEDIATE');

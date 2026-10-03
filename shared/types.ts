@@ -43,6 +43,25 @@ export interface AgentEnvelope {
   payload: unknown;
   createdAt: string;
 }
+export interface AgentTranscriptMessage extends AgentEnvelope {
+  skuIds: string[];
+  transport: {
+    status: "pending" | "sent" | "received" | "processed" | "failed" | "cancelled";
+    sent: boolean;
+    received: boolean;
+    processed: boolean;
+    roomId?: string;
+    bandMessageId?: string;
+  };
+}
+export interface AgentTranscript {
+  runId: string;
+  mode: RunMode;
+  source: "band" | "simulation";
+  messages: AgentTranscriptMessage[];
+  omittedMessages: number;
+  truncated: boolean;
+}
 export interface StoreProfile {
   id: string;
   name: string;

@@ -184,6 +184,7 @@ export function createApp(
   app.get("/api/runs/:id", (req, res) =>
     res.json(engine.snapshot(String(req.params.id))),
   );
+  app.get("/api/runs/:id/messages", (req, res) => res.json(engine.transcript(String(req.params.id))));
   app.get("/api/runs/:id/god", god, (req, res) =>
     res.json(engine.godSnapshot(String(req.params.id))),
   );

@@ -101,7 +101,7 @@ The quality pass also added server-side god-session expiry, cancellation fences 
 
 ## Verification status
 
-The local application is implemented and running at [the production demo](http://127.0.0.1:3001), with [the development preview](http://127.0.0.1:5173) also available. `npm run typecheck`, `npm test`, and `npm run build` pass. **The 56 tests in `npm test` include 15 integration-adapter tests and eight Glasser-adapter tests**; these are not separate totals to add together. The browser rehearsals verify both the complete simulation and the final actual live run: private-path rejection, Census/USDA evidence, operator/god views, confirmed receipts, exact approved flyer, reload, and mobile layout.
+The local application is implemented and running at [the production demo](http://127.0.0.1:3001), with [the development preview](http://127.0.0.1:5173) also available. `npm run typecheck`, `npm test`, and `npm run build` pass. **The 62 tests in `npm test` include 15 integration-adapter tests and eight Glasser-adapter tests**; these are not separate totals to add together. The browser rehearsals verify both the complete simulation and the final actual live run: private-path rejection, Census/USDA evidence, operator/god views, confirmed receipts, exact approved flyer, reload, and mobile layout.
 
 The current build passed a full **actual ZooWork + Band run in 146.615 seconds**: all eleven independent roles completed reasoning, all eight suppliers responded, and all 24 SKU decisions resolved. It selected 23 simulated purchases with 23 confirmed supplier receipts and one budget walkaway. ZooWork completed 23 reasoning calls; Band sent, received, and processed 82 messages. There were zero provider or technical failures. The ledger committed **$974.72**, released all remaining reservations, and passed independent stock, price-floor, and public-privacy checks. Apples won within budget, strawberries received a manager-approved increase, and avocados remained unavailable within their cap. See `server/integrations/verification.json` for sanitized provider evidence.
 
@@ -131,6 +131,7 @@ BASE_URL=http://127.0.0.1:3001 CHROMIUM_PATH=/home/nvidia/.cache/ms-playwright/c
 - `POST /api/demo/reset` with `{"confirm":true}` to clear saved purchasing state
 - `GET /api/trends`, `POST /api/trends/refresh` with an allowlisted `skuId`
 - `POST /api/runs`, `GET /api/runs/:id`, `GET /api/runs/:id/events`
+- `GET /api/runs/:id/messages` for saved public Band envelopes and delivery evidence
 - `POST /api/session/god` with `{"enabled":true}`, `DELETE /api/session/god`
 - `GET /api/runs/:id/god`, `GET /api/runs/:id/god/events`
 - `POST /api/runs/:id/cancel`
@@ -168,3 +169,12 @@ Reset requires the explicit confirmation body, but does not add an origin allowl
 node --import tsx tests/demo-server.ts
 # http://127.0.0.1:3002; serves the existing production UI build
 ```
+
+
+## Inspecting actual agent messages
+
+Open **Activity → Messages**, or inspect a product in **Purchasing**, to see saved buyer/supplier exchanges and manager budget requests. Readable fields and expandable JSON come from the actual stored public Band envelopes. These are structured messages, not a raw network capture or internal model thoughts. **Decision summaries** remain a separate view.
+
+Sender/receiver copies appear once. Sent, received, and processed are distinct transport facts; purchase acceptance and supplier receipts appear as separate correlated messages. Timestamps are envelope creation times. Product filtering includes batched requests and correlated replies. Queued/failed attempts remain labeled. Strict schemas withhold unexpected/private payloads and report omitted or truncated results. Simulation has summaries but no Band transcript; reset clears local transcripts.
+
+Read-only browser verification displayed all 82 messages from the existing live run without changing its reviewing state. The 62 offline tests include transcript privacy, fidelity, deduplication, reset, and restart regressions. Completed negotiations awaiting review or flyer composition now retain their full state across a restart; still-executing runs are marked interrupted.
