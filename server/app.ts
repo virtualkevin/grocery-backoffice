@@ -23,16 +23,8 @@ export function createApp(
     probeProviders?: () => Promise<unknown>;
     refreshTrends?: (topic: TrendTopic) => Promise<TrendReport>;
     now?: () => number;
-    publicOrigin?: string;
   } = {},
 ) {
-  let publicOrigin: string | undefined;
-  if (options.publicOrigin) {
-    const configured = new URL(options.publicOrigin);
-    if (!["http:", "https:"].includes(configured.protocol) || configured.origin !== options.publicOrigin)
-      throw new Error("APP_PUBLIC_ORIGIN must be an exact HTTP(S) origin without a path");
-    publicOrigin = configured.origin;
-  }
   const app = express();
   app.disable("x-powered-by");
   app.use((req, res, next) => {
@@ -70,22 +62,6 @@ export function createApp(
     const remote = req.socket.remoteAddress ?? "";
     if (!["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(remote))
       return res.status(403).json({ error: "Local demo access only" });
-    const origin = req.get("origin");
-    if (origin) {
-      try {
-        if (
-          origin !== publicOrigin &&
-          !["localhost", "127.0.0.1", "[::1]"].includes(
-            new URL(origin).hostname,
-          )
-        )
-          return res
-            .status(403)
-            .json({ error: "Cross-origin mutation rejected" });
-      } catch {
-        return res.status(403).json({ error: "Invalid origin" });
-      }
-    }
     next();
   };
   app.use("/api", (req, res, next) => {

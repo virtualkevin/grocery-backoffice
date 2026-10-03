@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { Engine } from "../server/engine.js";
 import { createApp } from "../server/app.js";
-test("HTTP and SSE privacy, explicitlocalgodsession, cross-origin rejection, approval revision", async () => {
+test("HTTP and SSE privacy, explicitlocalgodsession, origin-independent mutations, approval revision", async () => {
   const e = new Engine(":memory:", 0),
     r = e.create({}, false);
   await e.execute(r.id);
@@ -56,15 +56,15 @@ test("HTTP and SSE privacy, explicitlocalgodsession, cross-origin rejection, app
     assert.ok(!event.includes("floorCaseCents"));
     assert.ok(!event.includes("targetCaseCents"));
     controller.abort();
-    const forbidden = await fetch(`${base}/api/session/god`, {
+    const crossOrigin = await fetch(`${base}/api/session/god`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        origin: "https://evil.example",
+        origin: "https://other-client.example",
       },
       body: '{"enabled":true}',
     });
-    assert.equal(forbidden.status, 403);
+    assert.equal(crossOrigin.status, 200);
     const login = await fetch(`${base}/api/session/god`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -86,12 +86,12 @@ test("HTTP and SSE privacy, explicitlocalgodsession, cross-origin rejection, app
       (
         await fetch(`${base}/api/providers/probe`, {
           method: "POST",
-          headers: { cookie, origin: "https://evil.example" },
+          headers: { cookie, origin: "https://other-client.example" },
         })
       ).status,
-      403,
+      200,
     );
-    assert.equal(probeCalls, 1);
+    assert.equal(probeCalls, 2);
     const god = await fetch(`${base}/api/runs/${r.id}/god`, {
       headers: { cookie },
     });

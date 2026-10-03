@@ -100,7 +100,7 @@ test("social interest is opt-in, freshness-gated, capped and frozen without inje
     e.close();
   }
 });
-test("trend refresh is explicit, allowlisted, origin-protected and cooldown bounded", async () => {
+test("trend refresh is explicit, allowlisted, origin-independent and cooldown bounded", async () => {
   const e = new Engine(":memory:", 0);
   let calls = 0;
   let topic = "";
@@ -130,12 +130,7 @@ test("trend refresh is explicit, allowlisted, origin-protected and cooldown boun
       400,
     );
     assert.equal(calls, 0);
-    assert.equal(
-      (await post({ skuId: "apples" }, "https://evil.example")).status,
-      403,
-    );
-    assert.equal(calls, 0);
-    const fresh = await post({ skuId: "apples" });
+    const fresh = await post({ skuId: "apples" }, "https://other-client.example");
     assert.equal(fresh.status, 200);
     assert.equal(topic, "apples");
     assert.equal(calls, 1);
