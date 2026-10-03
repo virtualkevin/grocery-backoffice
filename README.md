@@ -175,6 +175,8 @@ node --import tsx tests/demo-server.ts
 
 Open **Activity → Messages**, or inspect a product in **Purchasing**, to see saved buyer/supplier exchanges and manager budget requests. Readable fields and expandable JSON come from the actual stored public Band envelopes. These are structured messages, not a raw network capture or internal model thoughts. **Decision summaries** remain a separate view.
 
+**Activity → Council** filters the same saved transcript to buyer–manager discussions. Participant cards show each buyer’s recorded contributions; a buyer with no messages is shown honestly as having no recorded discussion. The current run contains the actual fruit-buyer budget request and manager approval, without invented dialogue or an opening planning round.
+
 Sender/receiver copies appear once. Sent, received, and processed are distinct transport facts; purchase acceptance and supplier receipts appear as separate correlated messages. Timestamps are envelope creation times. Product filtering includes batched requests and correlated replies. Queued/failed attempts remain labeled. Strict schemas withhold unexpected/private payloads and report omitted or truncated results. Simulation has summaries but no Band transcript; reset clears local transcripts.
 
 Read-only browser verification displayed all 82 messages from the existing live run without changing its reviewing state. The 62 offline tests include transcript privacy, fidelity, deduplication, reset, and restart regressions. Completed negotiations awaiting review or flyer composition now retain their full state across a restart; still-executing runs are marked interrupted.
