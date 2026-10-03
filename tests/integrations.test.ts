@@ -125,3 +125,14 @@ test('concurrent sends cannot use a room before membership provisioning complete
  assert.equal(sends,0);assert.equal(creates,1);assert.equal(transport.rooms.size,0);
  release();await Promise.all([first,second]);assert.equal(sends,2);assert.equal(creates,1);assert.equal(transport.rooms.size,1);
 });
+
+test('Zoo reset cancellation during pending session creation interrupts the late session without consuming output',async()=>{
+ let release:()=>void=()=>{};let reached:()=>void=()=>{};let streamed=false;
+ const entered=new Promise<void>(resolve=>{reached=resolve});const pending=new Promise<void>(resolve=>{release=resolve});
+ const f=fakeZoo(async function*(){streamed=true;yield assistant('{"approve":true}');yield finished;});
+ f.client.createSession=async()=>{reached();await pending;return {session_id:'late-session'} as any;};
+ const z=new ZooReasoner({client:f.client,statePath:null});await z.start();
+ const result=z.reason('manager',{runId:'reset-during-session'});const rejected=assert.rejects(result,/run_cancelled/);
+ await entered;await z.cancelRun('reset-during-session');release();await rejected;
+ assert.equal(streamed,false);assert.equal(z.status().completed,0);assert.ok(f.posted.some(events=>events[0]?.type==='user.interrupt'));await z.stop();
+});

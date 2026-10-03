@@ -15,7 +15,7 @@ try{
  const page=await browser.newPage({viewport:{width:1440,height:1060},deviceScaleFactor:1});
  page.on('pageerror',error=>errors.push(error.message));
  await page.goto(baseURL,{waitUntil:'domcontentloaded'});
- await page.locator('.hero').waitFor();
+ await page.locator('.hero, .fresh-hero').waitFor();
  for(const path of ['/server/fixtures.ts','/server/fixtures.ts?raw','/server/fixtures.ts?raw??','/server/engine.ts','/data/produce.sqlite','/data/integrations-zoo.json','/.env','/.git/config']){
   assert.ok([403,404].includes((await page.request.get(`${baseURL}${path}`)).status()),`Private file must be blocked: ${path}`);
  }

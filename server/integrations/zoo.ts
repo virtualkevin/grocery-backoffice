@@ -103,6 +103,7 @@ export class ZooReasoner {
         const sessionAgentId=agentId;
         const session=await this.retryIdempotent(()=>this.client!.createSession(sessionAgentId,{initial_events:[{type:'user.message',content:prompt}],metadata:{requestId,role,runId,runGeneration:ctx?.runGeneration??0}},requestId));
         sessionId=session.session_id;
+        if(this.cancelledRuns.has(runId))throw new IntegrationError('run_cancelled','zoowork');
         this.active.set(requestId,{agentId,sessionId,controller,runId});
         timer=setTimeout(()=>controller.abort(),Math.max(1,Math.min(this.turnTimeoutMs,deadline-Date.now())));
         stage='stream';let text='';let finished=false;
@@ -116,6 +117,7 @@ export class ZooReasoner {
           }
         }
         if(!finished)throw new IntegrationError('stream_ended_before_completion','zoowork');
+        if(this.cancelledRuns.has(runId))throw new IntegrationError('run_cancelled','zoowork');
         stage='parse';let result:unknown;
         try{result=parseDecisionJSON(text);}catch(error){
           // Exactly one repair, containing syntax instructions only, in the existing isolated session.
@@ -129,6 +131,7 @@ export class ZooReasoner {
           if(!finished)throw new IntegrationError('repair_incomplete','zoowork');
           result=parseDecisionJSON(text);
         }
+        if(this.cancelledRuns.has(runId))throw new IntegrationError('run_cancelled','zoowork');
         this.completed++;this.completedByRole[role]=(this.completedByRole[role]??0)+1;this.error=undefined;return result;
       }catch(error){
         this.failed++;const safe=safeError(error,'zoowork');this.error=safe.code;

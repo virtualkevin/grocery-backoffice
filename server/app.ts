@@ -162,6 +162,17 @@ export function createApp(
     res.clearCookie("produce_god", { path: "/api" });
     res.json({ enabled: false });
   });
+  app.post("/api/demo/reset", local, (req, res) => {
+    if (req.body?.confirm !== true)
+      throw new DomainError("Confirm demo reset before clearing purchasing state", 400);
+    const result = engine.resetDemo();
+    starts.clear();
+    godSessions.clear();
+    for (const streams of godStreams.values()) for (const stream of streams) stream.end();
+    godStreams.clear();
+    res.clearCookie("produce_god", { path: "/api" });
+    res.json(result);
+  });
   app.post("/api/runs", (req, res) => {
     const key = req.get("idempotency-key");
     if (key && starts.has(key))
@@ -204,7 +215,16 @@ export function createApp(
       const write = () => {
         if (res.writableEnded) return;
         if (godToken && !hasGodSession(godToken)) return res.end();
-        const s = snapshot();
+        let s;
+        try { s = snapshot(); }
+        catch (error) {
+          if (error instanceof DomainError && error.status === 404) {
+            res.write(`event: reset\ndata: {"reset":true}\n\n`);
+            res.end();
+            return;
+          }
+          throw error;
+        }
         res.write(
           `id: ${s.eventSeq}\nevent: snapshot\ndata: ${JSON.stringify(s)}\n\n`,
         );

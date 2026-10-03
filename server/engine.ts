@@ -51,6 +51,7 @@ export interface ProviderBridge {
   ): () => void;
   status(): unknown;
   cancelRun?(runId: string): Promise<unknown>;
+  resetRuns?(runIds: string[]): void;
 }
 export class DomainError extends Error {
   constructor(
@@ -183,6 +184,30 @@ export class Engine {
       },
     };
   }
+  resetDemo() {
+    const ids = [...this.runs.keys()];
+    // Fence synchronously before releasing any async work. External interrupts are best effort.
+    if (this.bridge?.resetRuns) this.bridge.resetRuns(ids);
+    else for (const id of ids) void this.bridge?.cancelRun?.(id).catch(() => {});
+    for (const run of this.runs.values()) {
+      run.status = "cancelled";
+      run.generation++;
+    }
+    for (const wait of this.waits.values()) {
+      clearTimeout(wait.timer);
+      wait.reject(new DomainError("Demo reset; previous run is no longer active", 409));
+    }
+    this.waits.clear();
+    transaction(this.db, () => {
+      for (const table of ["inbox", "outbox", "events", "purchases", "intents", "stock", "runs"])
+        this.db.exec(`DELETE FROM ${table}`);
+    });
+    this.runs.clear();
+    this.privateStates.clear();
+    this.liveChoices.clear();
+    for (const id of ids) this.notify(id);
+    return { reset: true as const, clearedRuns: ids.length, bootstrap: this.bootstrap() };
+  }
   subscribe(fn: (id: string) => void) {
     this.listeners.add(fn);
     return () => this.listeners.delete(fn);
@@ -191,6 +216,7 @@ export class Engine {
     for (const listener of this.listeners) listener(id);
   }
   private persist(run: RunSnapshot) {
+    this.get(run.id);
     this.db
       .prepare(
         "INSERT INTO runs(id,generation,status,snapshot) VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET generation=excluded.generation,status=excluded.status,snapshot=excluded.snapshot",
@@ -279,6 +305,7 @@ export class Engine {
     summary: string,
     data?: Record<string, unknown>,
   ) {
+    this.get(run.id);
     const e: RunEvent = {
       id: randomUUID(),
       runId: run.id,
@@ -1301,8 +1328,8 @@ export class Engine {
         this.waits.delete(key);
       }
     }
-    const run = this.get(id);
-    if (terminal.has(run.status)) return;
+    const run = this.runs.get(id);
+    if (!run || terminal.has(run.status)) return;
     run.status = "failed";
     run.generation++;
     for (const decision of run.decisions)
@@ -1617,6 +1644,7 @@ export class Engine {
     }
   }
   private async receive(message: AgentEnvelope) {
+    if (!this.runs.has(message.runId)) return;
     const run = this.assertActive(message.runId, message.runGeneration);
     if (!this.bridge) return;
     const inserted = this.db

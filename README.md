@@ -101,7 +101,7 @@ The quality pass also added server-side god-session expiry, cancellation fences 
 
 ## Verification status
 
-The local application is implemented and running at [the production demo](http://127.0.0.1:3001), with [the development preview](http://127.0.0.1:5173) also available. `npm run typecheck`, `npm test`, and `npm run build` pass. **The 49 tests in `npm test` include 14 integration-adapter tests and eight Glasser-adapter tests**; these are not separate totals to add together. The browser rehearsals verify both the complete simulation and the final actual live run: private-path rejection, Census/USDA evidence, operator/god views, confirmed receipts, exact approved flyer, reload, and mobile layout.
+The local application is implemented and running at [the production demo](http://127.0.0.1:3001), with [the development preview](http://127.0.0.1:5173) also available. `npm run typecheck`, `npm test`, and `npm run build` pass. **The 56 tests in `npm test` include 15 integration-adapter tests and eight Glasser-adapter tests**; these are not separate totals to add together. The browser rehearsals verify both the complete simulation and the final actual live run: private-path rejection, Census/USDA evidence, operator/god views, confirmed receipts, exact approved flyer, reload, and mobile layout.
 
 The current build passed a full **actual ZooWork + Band run in 146.615 seconds**: all eleven independent roles completed reasoning, all eight suppliers responded, and all 24 SKU decisions resolved. It selected 23 simulated purchases with 23 confirmed supplier receipts and one budget walkaway. ZooWork completed 23 reasoning calls; Band sent, received, and processed 82 messages. There were zero provider or technical failures. The ledger committed **$974.72**, released all remaining reservations, and passed independent stock, price-floor, and public-privacy checks. Apples won within budget, strawberries received a manager-approved increase, and avocados remained unavailable within their cap. See `server/integrations/verification.json` for sanitized provider evidence.
 
@@ -128,6 +128,7 @@ BASE_URL=http://127.0.0.1:3001 CHROMIUM_PATH=/home/nvidia/.cache/ms-playwright/c
 ## Local API
 
 - `GET /api/bootstrap`, `GET /api/capabilities`, `GET /api/health`
+- `POST /api/demo/reset` with `{"confirm":true}` to clear saved purchasing state
 - `GET /api/trends`, `POST /api/trends/refresh` with an allowlisted `skuId`
 - `POST /api/runs`, `GET /api/runs/:id`, `GET /api/runs/:id/events`
 - `POST /api/session/god` with `{"enabled":true}`, `DELETE /api/session/god`
@@ -153,3 +154,17 @@ systemctl --user restart grocery-backoffice.service
 ```
 
 Tailscale Serve HTTPS could replace the private socket proxy after an administrator authorizes Serve on this host. It currently requires sudo and was not enabled. The browser was checked through the private HTTP address for assets, current saved run, SSE, God-mode grant/revoke, reload, and origin-independent session mutations without creating a run or making paid provider calls. A second physical device still depends on the tailnet’s access policy.
+
+
+## Resetting the demonstration
+
+Use **Reset demo** and confirm the dialog to return to the empty workspace. Reset clears all local purchasing runs, decisions, stock allocations, budgets, quotes, messages, receipts, promotions, and composed flyer records. The next run starts with the seeded store inventory and default budget. Existing run streams receive a reset event, God sessions are revoked, and other open tabs return to the empty workspace.
+
+Credentials, connected provider agents, ZooWork role resources, Band rooms, cached Census/USDA/social research, and static generated artwork remain available. Provider diagnostic counters remain cumulative. Reset deletes local Band message payloads for cleared runs and retains only their run-ID cancellation tombstones alongside the existing room registry, so delayed messages cannot restore purchasing state after restart. Provider cancellation is best effort and session-specific; a request already sent externally cannot be unsent. No external rooms or provider resources are deleted.
+
+Reset requires the explicit confirmation body, but does not add an origin allowlist or require entering God mode. It is a destructive local demo operation exposed through the existing private access path. The implementation was tested against isolated databases and an isolated browser server; the saved production purchasing run was preserved. For a provider-free browser test server using only in-memory purchasing state:
+
+```sh
+node --import tsx tests/demo-server.ts
+# http://127.0.0.1:3002; serves the existing production UI build
+```

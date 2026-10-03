@@ -1,6 +1,7 @@
 import { Agent, GenericAdapter, type PlatformMessage } from '@band-ai/sdk';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { ROLE_IDS, type AgentEnvelope, type RoleId } from '../../shared/types.js';
 import { IntegrationError, isEnvelope, safeError } from './safety.js';
 
@@ -53,9 +54,10 @@ export class BandTransport {
     this.recentFailures.push({stage,from:envelope.from,to:envelope.to,code:safeError(error,'band').code,errorType:typeof name==='string'&&/^[A-Za-z0-9_]{1,50}$/.test(name)?name:'unknown'});
     this.recentFailures=this.recentFailures.slice(-20);
   }
-  constructor(){
-    mkdirSync('data',{recursive:true});this.db=new DatabaseSync('data/integrations-band.sqlite');
-    this.db.exec(`PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS rooms(pair_key TEXT PRIMARY KEY,room_id TEXT NOT NULL);CREATE TABLE IF NOT EXISTS inbox(id TEXT PRIMARY KEY,band_id TEXT NOT NULL,room_id TEXT NOT NULL,payload TEXT NOT NULL,state TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,error TEXT);CREATE TABLE IF NOT EXISTS outbox(id TEXT PRIMARY KEY,room_id TEXT,payload TEXT NOT NULL,state TEXT NOT NULL,band_id TEXT,error TEXT);`);
+  constructor(path='data/integrations-band.sqlite'){
+    if(path!==':memory:')mkdirSync(dirname(path),{recursive:true});this.db=new DatabaseSync(path);
+    this.db.exec(`PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS reset_runs(run_id TEXT PRIMARY KEY); CREATE TABLE IF NOT EXISTS rooms(pair_key TEXT PRIMARY KEY,room_id TEXT NOT NULL);CREATE TABLE IF NOT EXISTS inbox(id TEXT PRIMARY KEY,band_id TEXT NOT NULL,room_id TEXT NOT NULL,payload TEXT NOT NULL,state TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0,error TEXT);CREATE TABLE IF NOT EXISTS outbox(id TEXT PRIMARY KEY,room_id TEXT,payload TEXT NOT NULL,state TEXT NOT NULL,band_id TEXT,error TEXT);`);
+    for(const row of this.db.prepare('SELECT run_id FROM reset_runs').all())this.cancelledRuns.add(String(row.run_id));
     for(const row of this.db.prepare('SELECT pair_key,room_id FROM rooms').all() as Array<{pair_key:string;room_id:string}>){this.rooms.set(row.pair_key,row.room_id);this.allowedRooms.add(row.room_id);}
     this.db.prepare("UPDATE inbox SET state='received' WHERE state='processing'").run();
   }
@@ -85,7 +87,7 @@ export class BandTransport {
   onMessage(handler:Handler){this.handlers.add(handler);this.drain();return()=>this.handlers.delete(handler);}
   private async receive(role:RoleId,message:PlatformMessage,roomId:string){
     const envelope=decodeBandEnvelope(message);
-    if(!envelope)return;
+    if(!envelope||this.cancelledRuns.has(envelope.runId))return;
     const sender=this.identities.get(envelope.from);
     const pair=[envelope.from,envelope.to].sort().join(':');
     const expected=this.rooms.get(`${envelope.runId}:${pair}`);
@@ -103,7 +105,7 @@ export class BandTransport {
       if(this.draining.has(row.id))continue;this.draining.add(row.id);
       this.db.prepare("UPDATE inbox SET state='processing',attempts=attempts+1 WHERE id=?").run(row.id);
       setImmediate(async()=>{
-        try{const envelope=JSON.parse(row.payload) as AgentEnvelope;for(const handler of this.handlers)await handler(envelope);this.db.prepare("UPDATE inbox SET state='processed' WHERE id=?").run(row.id);this.processed++;}
+        try{const envelope=JSON.parse(row.payload) as AgentEnvelope;if(this.cancelledRuns.has(envelope.runId)){this.db.prepare("UPDATE inbox SET state='cancelled' WHERE id=?").run(row.id);return;}for(const handler of this.handlers)await handler(envelope);this.db.prepare("UPDATE inbox SET state='processed' WHERE id=?").run(row.id);this.processed++;}
         catch(error){this.db.prepare("UPDATE inbox SET state='failed',error=? WHERE id=?").run(safeError(error,'band').code,row.id);}
         finally{this.draining.delete(row.id);}
       });
@@ -135,12 +137,24 @@ export class BandTransport {
         identity.agent!.runtime.link.queueEvent({type:'room_added',roomId:created.id,payload:{id:created.id,inserted_at:now,updated_at:now}});
         await identity.agent!.runtime.link.subscribeRoom(created.id);
       }
+      if(this.cancelledRuns.has(envelope.runId))throw new IntegrationError('run_cancelled','band');
       this.rooms.set(key,created.id);
       this.db.prepare('INSERT OR REPLACE INTO rooms(pair_key,room_id) VALUES(?,?)').run(key,created.id);
       return created.id;
     })();
     this.creatingRooms.set(key,operation);
     try{return await operation;}catch(error){this.recordFailure(stage,envelope,error);this.rooms.delete(key);this.db.prepare('DELETE FROM rooms WHERE pair_key=?').run(key);throw error;}finally{this.creatingRooms.delete(key);}
+  }
+  resetRuns(runIds:string[]){
+    this.db.exec('BEGIN IMMEDIATE');
+    try{
+      for(const id of runIds){
+        this.db.prepare('INSERT OR IGNORE INTO reset_runs(run_id) VALUES(?)').run(id);
+        for(const table of ['inbox','outbox'])this.db.prepare(`DELETE FROM ${table} WHERE json_extract(payload,'$.runId')=?`).run(id);
+      }
+      this.db.exec('COMMIT');
+    }catch(error){this.db.exec('ROLLBACK');throw error;}
+    for(const id of runIds)this.cancelledRuns.add(id);
   }
   cancelRun(runId:string){
     this.cancelledRuns.add(runId);

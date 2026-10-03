@@ -52,6 +52,7 @@ export function createIntegrationService(){
     send(envelope:AgentEnvelope){return band.send(envelope);},
     onMessage(callback:(envelope:AgentEnvelope)=>Promise<void>|void){return band.onMessage(envelope=>{if(!probeRuns.has(envelope.runId))return callback(envelope);});},
     probeTransport(){return probeFlight??=(async()=>probeTransport())().finally(()=>{probeFlight=undefined;});},
+    resetRuns(runIds:string[]){band.resetRuns(runIds);for(const id of runIds)void zoo.cancelRun(id).catch(()=>{});},
     cancelRun(runId:string){band.cancelRun(runId);return zoo.cancelRun(runId);},
     status(){
       const z=zoo.status(),b=band.status();
