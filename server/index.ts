@@ -30,6 +30,7 @@ const refreshProviders = async () => {
   return integration.status();
 };
 const server = createApp(engine, {
+  publicOrigin: process.env.APP_PUBLIC_ORIGIN,
   refreshProviders,
   probeProviders: () => integration.probeTransport(),
   refreshTrends: fetchTrendSignals,

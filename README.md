@@ -138,4 +138,18 @@ BASE_URL=http://127.0.0.1:3001 CHROMIUM_PATH=/home/nvidia/.cache/ms-playwright/c
 - `POST /api/providers/refresh`
 - `POST /api/providers/probe` with an authorized local god session; fixed task-role pairs only
 
-God access is a server-checked local demo session, not production authentication. The server binds only to loopback and rejects cross-origin mutations. A public deployment would require a production identity/access model.
+God access is a server-checked demo session, not production authentication. The server binds only to loopback and rejects foreign-origin mutations. A private reverse proxy can use the exact `APP_PUBLIC_ORIGIN` configuration; arbitrary Host headers do not grant access. A public deployment would require a production identity/access model.
+
+
+## Private Tailscale access on the demo host
+
+Open **http://100.100.80.11:3001** from another device connected to the same tailnet and permitted by its access policy. The app remains bound to `127.0.0.1:3001`. A systemd socket proxy listens only on this host’s Tailscale address and forwards to loopback; there is no public listener or Funnel. HTTP travels inside the encrypted Tailscale connection. `APP_PUBLIC_ORIGIN=http://100.100.80.11:3001` admits that exact browser origin while preserving foreign-origin rejection.
+
+The installed user units are `grocery-backoffice.service`, `grocery-backoffice-tailnet.socket`, and `grocery-backoffice-tailnet.service` under `~/.config/systemd/user`. They survive terminal and agent exit and start with the user manager. User lingering is disabled on this host, so a full logout can stop them; this setup does not promise availability before login after a reboot. To inspect or restart the app:
+
+```sh
+systemctl --user status grocery-backoffice.service grocery-backoffice-tailnet.socket
+systemctl --user restart grocery-backoffice.service
+```
+
+Tailscale Serve HTTPS could replace the private socket proxy after an administrator authorizes Serve on this host. It currently requires sudo and was not enabled. The browser was checked through the private HTTP address for assets, current saved run, SSE, God-mode grant/revoke, reload, and foreign-origin rejection without creating a run or making paid provider calls. A second physical device still depends on the tailnet’s access policy.
