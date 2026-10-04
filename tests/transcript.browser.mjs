@@ -36,7 +36,7 @@ try{
  const chronological=[...transcript.messages].sort((a,b)=>Date.parse(a.createdAt)-Date.parse(b.createdAt)||a.id.localeCompare(b.id));
  await page.goto(baseURL,{waitUntil:'domcontentloaded'});
  await page.waitForFunction(id=>document.querySelector('main')?.dataset.runId===id,runId);
- await page.locator('.nav-item').filter({hasText:'Activity'}).click();
+ await page.locator('.nav-item').filter({hasText:'Activity'}).click();await page.getByRole('button',{name:'All messages',exact:true}).click();
  await page.getByText('Actual Band records',{exact:true}).waitFor();
  assert.equal(await page.locator('.transcript-message').count(),Math.min(20,transcript.messages.length));
  assert.deepEqual(await page.locator('.transcript-message').evaluateAll(nodes=>nodes.map(node=>node.dataset.messageId)),chronological.slice(0,20).map(message=>message.id));
@@ -67,6 +67,8 @@ try{
  await page.getByRole('button',{name:'View messages for Apples',exact:true}).click();
  await page.getByText('Actual Band records',{exact:true}).waitFor();
  assert.equal(await page.getByLabel('Filter messages by product').inputValue(),'apples');
+ await page.getByRole('button',{name:'All messages',exact:true}).click();
+ await page.getByText('Actual Band records',{exact:true}).waitFor();
  checks.push('Product detail opens its actual transcript; derived decision summaries remain clearly separate');
  await page.getByRole('button',{name:'Refresh messages',exact:true}).click();
  await page.getByText('Actual Band records',{exact:true}).waitFor();
@@ -80,7 +82,7 @@ try{
  checks.push('Mobile transcript and expanded JSON remain inside the viewport');
  await page.reload({waitUntil:'domcontentloaded'});
  await page.waitForFunction(id=>document.querySelector('main')?.dataset.runId===id,runId);
- await page.locator('.nav-item').filter({hasText:'Activity'}).click();
+ await page.locator('.nav-item').filter({hasText:'Activity'}).click();await page.getByRole('button',{name:'All messages',exact:true}).click();
  await page.getByText('Actual Band records',{exact:true}).waitFor();
  const after=await(await page.request.get(`${baseURL}/api/runs/${runId}`)).json();
  assert.equal(hash(after),beforeHash,'Read-only review preserves the complete current run snapshot');

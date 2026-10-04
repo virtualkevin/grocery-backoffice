@@ -173,7 +173,7 @@ node --import tsx tests/demo-server.ts
 
 ## Inspecting actual agent messages
 
-Open **Activity → Messages**, or inspect a product in **Purchasing**, to see saved buyer/supplier exchanges and manager budget requests. Human-readable requests, offers, counteroffers, commitments, and receipts come first, with every line in a batch available without opening JSON. These renderings come from the actual stored public Band envelopes; the original payload JSON remains collapsed as optional detail. These are structured messages, not a raw network capture or internal model thoughts. **Decision summaries** remain a separate view.
+Open **Activity → Messages**, or inspect a product in **Purchasing**, to follow a product/supplier conversation in opposing chat bubbles. The default conversation selects a recorded negotiation; **All messages** keeps the complete log available. Buyer requests and their actual supplier replies remain in chronological order. Human-readable requests, offers, counteroffers, commitments, and receipts come first, with every line in a batch available without opening JSON. These renderings come from the actual stored public Band envelopes; the original payload JSON remains collapsed as optional detail. These are structured messages, not a raw network capture or internal model thoughts. **Decision summaries** remain a separate view.
 
 **Activity → Council** filters the same saved transcript to buyer–manager discussions. Participant cards show each buyer’s recorded contributions; a buyer with no messages is shown honestly as having no recorded discussion. The current run contains the actual fruit-buyer budget request and manager approval, without invented dialogue or an opening planning round.
 

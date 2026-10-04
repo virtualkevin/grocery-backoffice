@@ -7,7 +7,7 @@ const hash=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex'),money
 try{
  const boot=await(await page.request.get(`${base}/api/bootstrap`)).json(),run=boot.currentRun;assert.ok(run&&['reviewing','complete','flyer_ready'].includes(run.status));
  const before=await(await page.request.get(`${base}/api/runs/${run.id}`)).json(),transcript=await(await page.request.get(`${base}/api/runs/${run.id}/messages`)).json();
- await page.goto(base,{waitUntil:'domcontentloaded'});await page.waitForFunction(id=>document.querySelector('main')?.dataset.runId===id,run.id);await page.locator('.nav-item').filter({hasText:'Activity'}).click();await page.getByText('Actual Band records',{exact:true}).waitFor();
+ await page.goto(base,{waitUntil:'domcontentloaded'});await page.waitForFunction(id=>document.querySelector('main')?.dataset.runId===id,run.id);await page.locator('.nav-item').filter({hasText:'Activity'}).click();await page.getByRole('button',{name:'All messages',exact:true}).click();await page.getByText('Actual Band records',{exact:true}).waitFor();
  assert.equal(await page.locator('.message-json[open]').count(),0);
  while(await page.getByRole('button',{name:/Show next \d+ messages/}).count())await page.getByRole('button',{name:/Show next \d+ messages/}).click();
  const cardFor=m=>page.locator(`[data-message-id="${m.id}"]`);
@@ -22,7 +22,7 @@ try{
  const filteredRfq=cardFor(rfq);await filteredRfq.getByRole('button',{name:`Show all ${rfq.payload.lines.length} products`}).click();assert.equal(await filteredRfq.locator('.readable-line').count(),rfq.payload.lines.length);await filteredRfq.getByRole('button',{name:'Show fewer products'}).click();
  await page.setViewportSize({width:390,height:844});await firstQuote.scrollIntoViewIfNeeded();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.screenshot({path:`${out}/03-readable-mobile.png`,fullPage:false});
  const first=page.locator('.transcript-message').first();await first.locator('summary').focus();await page.keyboard.press('Enter');const firstId=await first.getAttribute('data-message-id');assert.deepEqual(JSON.parse(await first.locator('pre').textContent()),transcript.messages.find(m=>m.id===firstId).payload);
- await page.getByRole('button',{name:'Council',exact:true}).click();await page.getByText('Actual Band records',{exact:true}).waitFor();assert.ok((await page.locator('.readable-message').first().innerText()).includes('Requesting'));
+ await page.getByRole('button',{name:'Council',exact:true}).click();await page.getByText('Actual Band records',{exact:true}).waitFor();assert.ok((await page.locator('.chat-text').first().innerText()).includes('Requesting'));
  checks.push('Filtered batches still expand fully; mobile fits; keyboard JSON exact; Council shares readable format');
  const after=await(await page.request.get(`${base}/api/runs/${run.id}`)).json();assert.equal(hash(before),hash(after));assert.deepEqual(errors,[]);assert.deepEqual(writes,[]);const report={passed:true,runId:run.id,status:run.status,messageCount:transcript.messages.length,beforeHash:hash(before),afterHash:hash(after),checks,errors,writes};await writeFile(`${out}/report.json`,JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
 }finally{await browser.close();}
